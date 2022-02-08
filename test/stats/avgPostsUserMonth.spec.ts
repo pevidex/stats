@@ -1,47 +1,45 @@
 import { expect } from "chai";
-import { Month } from "../../src/definitions";
-import { calculateAvgPostsUserMonth } from "../../src/stats/avgPostsUserMonth";
-import { generateListOfPostsSummariesPerUser } from "../testUtils";
+import { MonthData } from "../../src/definitions";
+import { calculateAvgPostsUserMonth, UsersStats } from "../../src/stats/avgPostsUserMonth";
 
 describe("calculateAvgPostsUserMonth", () => {
   it("should return expected values", () => {
-    const january: Month = {
-      year: 2021,
-      monthNr: 0,
-      monthName: "January",
-      posts: [
-        ...generateListOfPostsSummariesPerUser("user1", 0, 2021, 16),
-        ...generateListOfPostsSummariesPerUser("user2", 0, 2021, 8),
-      ],
-    };
-    const february: Month = {
-      year: 2021,
-      monthNr: 1,
-      monthName: "February",
-      posts: [...generateListOfPostsSummariesPerUser("user1", 1, 2021, 1)],
-    };
-    const april: Month = {
-      year: 2022,
-      monthNr: 3,
-      monthName: "April",
-      posts: [...generateListOfPostsSummariesPerUser("user1", 3, 2022, 11)],
-    };
-    const september: Month = {
-      year: 2022,
-      monthNr: 8,
-      monthName: "September",
-      posts: [
-        ...generateListOfPostsSummariesPerUser("user1", 8, 2022, 2),
-        ...generateListOfPostsSummariesPerUser("user2", 8, 2022, 4),
-      ],
-    };
-    const usersStats = calculateAvgPostsUserMonth([
-      january,
-      february,
-      april,
-      september,
-    ]).stats;
-    expect(usersStats["user1"]).to.be.eql(7.5);
-    expect(usersStats["user2"]).to.be.eql(3);
+    const months: MonthData[] = [
+      {
+        yearNr: 2021,
+        monthNr: 0,
+        totalChars: 120,
+        totalPosts: 2,
+        longestPostLenght: 100,
+      },
+      {
+        yearNr: 2021,
+        monthNr: 1,
+        totalChars: 240,
+        totalPosts: 4,
+        longestPostLenght: 120,
+      },
+      {
+        yearNr: 2022,
+        monthNr: 3,
+        totalChars: 1200,
+        totalPosts: 16,
+        longestPostLenght: 340,
+      },
+      {
+        yearNr: 2022,
+        monthNr: 8,
+        totalChars: 400,
+        totalPosts: 5,
+        longestPostLenght: 140,
+      },
+    ];
+    const usersStats = calculateAvgPostsUserMonth({
+      months: months,
+      weeks: [],
+      users: [{ user: "user1", monthStats: months }],
+    }).stats;
+    const user1: UsersStats = usersStats.find((user: UsersStats) => user.userId == "user1");
+    expect(user1.avgPostsMonth).to.be.eql(6.75);
   });
 });

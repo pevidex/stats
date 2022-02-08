@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Post } from "../definitions";
-import { ApiError, HttpError, TokenError } from "./postSummaries";
+import { ApiError, HttpError, TokenError } from "./postsRawData";
 
 type PostRepository = (params: PostsParams, url: string) => Promise<Post[]>;
 type TokenRepository = (body: TokenBody, url: string) => Promise<string>;

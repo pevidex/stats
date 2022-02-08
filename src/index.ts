@@ -4,7 +4,7 @@ import {
   fetchTokenGen,
   PostsParams,
 } from "./services/httpService";
-import { getPostSummaries } from "./services/postSummaries";
+import { getPostRawData } from "./services/postsRawData";
 import { calculateAvgCharLengthMonth } from "./stats/avgCharLengthMonth";
 import { writeToFile } from "./utils";
 import dotenv from "dotenv";
@@ -13,18 +13,21 @@ import { calculateTotalPostsWeek } from "./stats/totalPostsWeek";
 import { calculateAvgPostsUserMonth } from "./stats/avgPostsUserMonth";
 
 /**
- * Main file
- * 
  * Some considerations:
- * - I decided to focus on certain aspects that took me time from testing and validating the stats functions;
- * - The focus on my approach was to add the ability to easily remove and add new stat functions
- * - In some situations I took advantage on the assumption we're going to have only 10 pages of data.
- *  This reduce a bit the amount of work but could easily adapted to fetch N number of pages.
- * - Despite memory consumption not being mentioned as a concern, I adopted the
- *  class PostSummary instead of Post to avoid handling post content.
- * - I added a really small test coverage just to show how I would test things. 
- *  It was not asked, so I didn't focus much on that.
- * - Stats response could have a more appealing structure and merge the monthly stats together.
+ * - I decided to focus on the following aspects:
+ *   1) ability to add, remove stat functions easily;
+ *   2) Memory consumption by not storing the posts and by not reading all
+ *      the request pages at once.
+ *   3) Performance is also being taken into consideration by avoiding unnecessary cycles;
+ *   4) ability to easily mock external dependencies for testing purposes
+ *   5) clear separation of concerns and project organization
+ * - I could improve at:
+ *   1) Tests were not my focus here. I have some to display how I would test, but it lacks coverage;
+ *   2) Output object could have a better defined type
+ *   3) There are some scenarios I would like to test that I believe can have flaws. 
+ *      The function to calculate the weeknr for example. I though about bringing a library to calculate this
+ *      However I went for my own implementation for fun.
+ *   4) Input validations and documentation could also be strictier
  **/
 
 dotenv.config();
@@ -59,7 +62,9 @@ const fetchPagesFn = fetchPostsByPageGen(postsUrl);
 const writeToFileFn = (filePath: string) => (content: string | Buffer) =>
   writeToFile(filePath, content);
 
-const statsToResponse = (stats: Stat[]) => {stats};
+const statsToResponse = (stats: Stat[]) => {
+  return { stats };
+};
 
 export const main = async (
   fetchToken: () => Promise<string>,
@@ -74,22 +79,14 @@ export const main = async (
     calculateAvgPostsUserMonth,
   ];
 
-  return getPostSummaries(numberOfPages, fetchPages, fetchToken)
-    .then((postSummaries) => listOfCalFns.map((fn) => fn(postSummaries)))
+  return getPostRawData(numberOfPages, fetchPages, fetchToken)
+    .then((rawData) => listOfCalFns.map((fn) => fn(rawData)))
     .then(statsToResponse)
     .then(JSON.stringify)
     .then(writeToFile)
     .catch(console.error);
 };
 
-/**
- * TODO:
- * - add a test to a stat;
- * - add a test to the main endpoint;
- * - add comments;
- * - review stat structure;
- * - add a readme;
- * - reset github commits;
- */
-
-main(fetchTokenFn, fetchPagesFn, writeToFileFn(pathJsonStats));
+//Since this is index.ts, this func call should be commented. 
+//Otherwise importing this file wil have this executed (ex: tests)
+//main(fetchTokenFn, fetchPagesFn, writeToFileFn(pathJsonStats));

@@ -1,10 +1,35 @@
 export interface Stat {
   name: string,
-  stats: any,
+  stats: any, // todo this can be improved
 }
 
 export interface StatsResponse {
-  stats: any[];
+  stats: Stat[];
+}
+
+export interface RawData {
+  months: MonthData[],
+  weeks: WeekData[],
+  users: UserData[];
+}
+
+export interface UserData {
+  user: string;
+  monthStats: MonthData[];
+}
+
+export interface WeekData {
+  yearNr: number;
+  weekNr: number;
+  totalPosts: number
+}
+
+export interface MonthData {
+  yearNr: number,
+  monthNr: number,
+  longestPostLenght: number;
+  totalChars: number;
+  totalPosts: number;
 }
 
 export interface Post {
@@ -16,18 +41,4 @@ export interface Post {
   created_time: Date;
 }
 
-export interface PostSummary {
-  date: Date;
-  //hash?: string; // can be useful
-  user: string;
-  length: number;
-}
-
-export type CalcStatsFn = (months: Month[]) => Stat;
-
-export interface Month {
-  year: number;
-  monthNr: number;
-  monthName: string;
-  posts: PostSummary[];
-}
+export type CalcStatsFn = (rawData: RawData) => Stat;

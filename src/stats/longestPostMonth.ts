@@ -1,4 +1,4 @@
-import { CalcStatsFn, Month, PostSummary } from "../definitions";
+import { CalcStatsFn, RawData } from "../definitions";
 
 interface MonthStat {
   monthNr: number;
@@ -6,21 +6,16 @@ interface MonthStat {
   longestPost: number;
 }
 
-export const longestPostPerMonth: CalcStatsFn = (months: Month[]) => {
-  // Average character length of posts per month
-  const monthStats: MonthStat[] = months.map((month) => {
+/**
+ * Average character length of posts per month
+ */
+export const longestPostPerMonth: CalcStatsFn = (rawData: RawData) => {
+  const monthStats: MonthStat[] = rawData.months.map((month) => {
     return {
       monthNr: month.monthNr,
-      year: month.year,
-      longestPost: getLongestPost(month.posts),
+      year: month.yearNr,
+      longestPost: month.longestPostLenght,
     };
   });
   return { name: "longestPostMonth", stats: monthStats };
-};
-
-const getLongestPost = (posts: PostSummary[]): number => {
-  return Math.max.apply(
-    Math,
-    posts.map((post) => post.length)
-  );
 };

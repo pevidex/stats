@@ -20,25 +20,8 @@ export const writeToFile = (path: string, content: Buffer | string) =>
     })
   );
 
-export const getNameForMonthNr = (monthNr: number): string => {
-  return [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ][monthNr];
-};
-
 export const getWeekNumber = (date: Date): number => {
-  const initDate = new Date(date.getFullYear(),0,1); // todo
+  const initDate = new Date(date.getFullYear(), 0, 1); // todo
   const endWeekOffet = 7 - initDate.getDay();
   let endWeek = new Date(initDate);
   endWeek.setDate(endWeek.getDate() + endWeekOffet);

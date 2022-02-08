@@ -1,33 +1,25 @@
-import { CalcStatsFn, Month, Stat } from "../definitions";
+import { CalcStatsFn, RawData, Stat } from "../definitions";
 
-// todo extract this definition
-interface UsersStats {
-  [key: string]: number;
+export interface UsersStats {
+  userId: string;
+  avgPostsMonth: number;
 }
 
 /**
  * Average number of posts per user per month
  */
 export const calculateAvgPostsUserMonth: CalcStatsFn = (
-  months: Month[]
+  rawData: RawData
 ): Stat => {
-  let stat: UsersStats = {};
-  /**
-   * 
-   */
-  months.forEach((month) => {
-    return month.posts.forEach((post) => {
-      const user = post.user;
-      if (stat[user]) {
-        return stat[user]++;
-      }
-      stat[user] = 1;
-    });
+  const userStats: UsersStats[] = rawData.users.map((userData) => {
+    return {
+      userId: userData.user,
+      avgPostsMonth:
+        userData.monthStats.reduce(
+          (accum, month) => accum + month.totalPosts,
+          0
+        ) / rawData.months.length,
+    };
   });
-  for (const user in stat) {
-    // I assumed we're dividing by the number of months we have data for
-    // If a certain month has no posts from any user at all it will not be counted
-    stat[user] = stat[user] == 0 ? 0 : stat[user] / months.length;
-  }
-  return { name: "avgPostsUserMonth", stats: stat };
+  return { name: "avgPostsUserMonth", stats: userStats };
 };
