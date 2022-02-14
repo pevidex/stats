@@ -89,4 +89,4 @@ export const main = async (
 
 //Since this is index.ts, this func call should be commented. 
 //Otherwise importing this file wil have this executed (ex: tests)
-//main(fetchTokenFn, fetchPagesFn, writeToFileFn(pathJsonStats));
+main(fetchTokenFn, fetchPagesFn, writeToFileFn(pathJsonStats));
